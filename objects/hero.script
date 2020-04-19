@@ -1,72 +1,29 @@
-go.property('speed', 100)
+go.property("speed", 100)
 
-local log = require 'utils.log'
+local debugdraw = require "debug-draw.debug-draw"
 
-local function reset(self)
+function init(self)
 	self.input = {}
 	self.dir = vmath.vector3()
 	self.correction = vmath.vector3()
-	self.has_beacon = false
-end
-
-local function trigger_action(self)
-	if self.has_beacon then
-		msg.post('robot', 'beacon', { position = go.get_position() })
-	else
-		-- TODO: give feedback that there's no any action available
-		print('HERO: no beacon, no action')
-	end
-end
-
-local function process_collision(self, message, sender)
-	if message.group == hash('beacon') then
-		msg.post('beacon#collisionobject', 'disable')
-		msg.post('beacon', 'set_parent', {parent_id = go.get_id()})
-		go.set_position(go.get_position() + vmath.vector3(0, 8, 0), 'beacon')
-		self.has_beacon = true
-	end
-
-	if message.group == hash('wall') or message.group == hash('robot') then
-		-- Get the info needed to move out of collision. We might
-		-- get several contact points back and have to calculate
-		-- how to move out of all of them by accumulating a
-		-- correction vector for this frame:
-		if message.distance > 0 then
-			-- First, project the accumulated correction onto
-			-- the penetration vector
-			local proj = vmath.project(self.correction, message.normal * message.distance)
-			if proj < 1 then
-				-- Only care for projections that does not overshoot.
-				local comp = (message.distance - message.distance * proj) * message.normal
-				-- Apply compensation
-				go.set_position(go.get_position() + comp)
-				-- Accumulate correction done
-				self.correction = self.correction + comp
-			end
-		end
-	end
-end
-
-function init(self)
-	reset(self)
-	msg.post('.', 'acquire_input_focus')
+	msg.post(".", "acquire_input_focus")
 end
 
 function update(self, dt)
 	local pos = go.get_position()
-	log.coords(pos, 8)
+	debugdraw.text('x:' .. math.floor(pos.x) .. '; y:' .. math.floor(pos.y), 0, 20)
 
 	-- update player position
-	if self.input[hash('move_up')] then
+	if self.input[hash("move_up")] then
 		self.dir.y = 1
-	elseif self.input[hash('move_down')] then
+	elseif self.input[hash("move_down")] then
 		self.dir.y = -1
 	else
 		self.dir.y = 0
 	end
-	if self.input[hash('move_left')] then
+	if self.input[hash("move_left")] then
 		self.dir.x = -1
-	elseif self.input[hash('move_right')] then
+	elseif self.input[hash("move_right")] then
 		self.dir.x = 1
 	else
 		self.dir.x = 0
@@ -84,9 +41,7 @@ function update(self, dt)
 end
 
 function on_input(self, action_id, action)
-	if action_id == hash('action_primary') then
-		trigger_action(self)
-	elseif action_id then
+	if action_id then
 		if action.pressed then
 			self.input[action_id] = true
 		elseif action.released then
@@ -96,7 +51,29 @@ function on_input(self, action_id, action)
 end
 
 function on_message(self, message_id, message, sender)
-	if message_id == hash('contact_point_response') then
+	if message_id == hash("contact_point_response") then
 		process_collision(self, message, sender)
+	end
+end
+
+function process_collision(self, message, sender)
+	if message.group == hash("walls") or message.group == hash("robot") then
+    -- Get the info needed to move out of collision. We might
+    -- get several contact points back and have to calculate
+    -- how to move out of all of them by accumulating a
+    -- correction vector for this frame:
+    if message.distance > 0 then
+      -- First, project the accumulated correction onto
+      -- the penetration vector
+      local proj = vmath.project(self.correction, message.normal * message.distance)
+      if proj < 1 then
+        -- Only care for projections that does not overshoot.
+        local comp = (message.distance - message.distance * proj) * message.normal
+        -- Apply compensation
+        go.set_position(go.get_position() + comp)
+        -- Accumulate correction done
+        self.correction = self.correction + comp
+      end
+    end
 	end
 end

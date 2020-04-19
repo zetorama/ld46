@@ -4,8 +4,8 @@ instances {
   prototype: "/orthographic/camera.go"
   children: "bg"
   position {
-    x: 0.0
-    y: 0.0
+    x: 160.0
+    y: 90.0
     z: 0.0
   }
   rotation {
@@ -28,7 +28,7 @@ instances {
     }
     properties {
       id: "zoom"
-      value: "8.0"
+      value: "4.0"
       type: PROPERTY_TYPE_NUMBER
     }
     properties {
@@ -87,8 +87,8 @@ instances {
   id: "hero"
   prototype: "/objects/hero.go"
   position {
-    x: 50.0
-    y: 30.0
+    x: 160.0
+    y: 90.0
     z: 0.1
   }
   rotation {
@@ -107,28 +107,8 @@ instances {
   id: "robot"
   prototype: "/objects/robot.go"
   position {
-    x: 175.0
-    y: 150.0
-    z: 0.1
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-instances {
-  id: "beacon"
-  prototype: "/objects/beacon.go"
-  position {
-    x: 185.0
-    y: 100.0
+    x: 50.0
+    y: 50.0
     z: 0.1
   }
   rotation {
@@ -185,61 +165,6 @@ embedded_instances {
   position {
     x: 0.0
     y: 0.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-embedded_instances {
-  id: "marker"
-  data: "components {\n"
-  "  id: \"particles\"\n"
-  "  component: \"/main/marker.particlefx\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  "embedded_components {\n"
-  "  id: \"sprite\"\n"
-  "  type: \"sprite\"\n"
-  "  data: \"tile_set: \\\"/assets/characters.atlas\\\"\\n"
-  "default_animation: \\\"marker\\\"\\n"
-  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
-  "blend_mode: BLEND_MODE_ALPHA\\n"
-  "\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: -0.9\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  ""
-  position {
-    x: 185.0
-    y: 100.0
     z: 0.0
   }
   rotation {

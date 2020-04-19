@@ -1,18 +1,3 @@
-components {
-  id: "robot"
-  component: "/objects/robot.script"
-  position {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-}
 embedded_components {
   id: "sprite"
   type: "sprite"
@@ -42,9 +27,8 @@ embedded_components {
   "friction: 0.1\n"
   "restitution: 0.5\n"
   "group: \"robot\"\n"
-  "mask: \"wall\"\n"
+  "mask: \"walls\"\n"
   "mask: \"hero\"\n"
-  "mask: \"beacon\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"
   "    shape_type: TYPE_BOX\n"

@@ -1,42 +1,26 @@
 images {
   image: "/assets/images/hero/hero-back.png"
-  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
   image: "/assets/images/hero/hero-face.png"
-  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
   image: "/assets/images/hero/hero-left.png"
-  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
   image: "/assets/images/hero/hero-right.png"
-  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
   image: "/assets/images/robot/robot-back.png"
-  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
   image: "/assets/images/robot/robot-face.png"
-  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
   image: "/assets/images/robot/robot-left.png"
-  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
   image: "/assets/images/robot/robot-right.png"
-  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
-}
-images {
-  image: "/assets/images/beacon.png"
-  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
-}
-images {
-  image: "/assets/images/marker.png"
-  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 margin: 0
 extrude_borders: 3
