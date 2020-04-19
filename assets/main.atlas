@@ -1,6 +1,0 @@
-images {
-  image: "/assets/images/hero.png"
-}
-margin: 0
-extrude_borders: 3
-inner_padding: 0

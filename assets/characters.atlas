@@ -1,0 +1,27 @@
+images {
+  image: "/assets/images/hero/hero-back.png"
+}
+images {
+  image: "/assets/images/hero/hero-face.png"
+}
+images {
+  image: "/assets/images/hero/hero-left.png"
+}
+images {
+  image: "/assets/images/hero/hero-right.png"
+}
+images {
+  image: "/assets/images/robot/robot-back.png"
+}
+images {
+  image: "/assets/images/robot/robot-face.png"
+}
+images {
+  image: "/assets/images/robot/robot-left.png"
+}
+images {
+  image: "/assets/images/robot/robot-right.png"
+}
+margin: 0
+extrude_borders: 3
+inner_padding: 0
