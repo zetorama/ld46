@@ -28,12 +28,12 @@ instances {
     }
     properties {
       id: "zoom"
-      value: "4.0"
+      value: "8.0"
       type: PROPERTY_TYPE_NUMBER
     }
     properties {
       id: "projection"
-      value: "FIXED_AUTO"
+      value: "FIXED_ZOOM"
       type: PROPERTY_TYPE_HASH
     }
     properties {
@@ -87,7 +87,7 @@ instances {
   id: "hero"
   prototype: "/objects/hero.go"
   position {
-    x: 30.0
+    x: 50.0
     y: 30.0
     z: 0.1
   }
@@ -107,8 +107,8 @@ instances {
   id: "robot"
   prototype: "/objects/robot.go"
   position {
-    x: 25.0
-    y: 130.0
+    x: 175.0
+    y: 150.0
     z: 0.1
   }
   rotation {
@@ -127,7 +127,7 @@ instances {
   id: "beacon"
   prototype: "/objects/beacon.go"
   position {
-    x: 130.0
+    x: 185.0
     y: 100.0
     z: 0.1
   }
