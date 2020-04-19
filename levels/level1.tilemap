@@ -909,7 +909,7 @@ layers {
   cell {
     x: 8
     y: 12
-    tile: 282
+    tile: 309
     h_flip: 0
     v_flip: 0
   }

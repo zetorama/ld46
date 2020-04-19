@@ -6,7 +6,7 @@ go.property('max_attempts', 3)
 local log = require 'utils.log'
 
 local ROBOT_STEP = 16
-local BEACON_THRESHOLD = 16
+local TARGET_THRESHOLD = 16
 
 local function reset(self)
 	self.correction = vmath.vector3()
@@ -18,6 +18,8 @@ local function stop(self)
 	-- TODO: give feedback, that robot cannot move anymore
 	print('ROBOT: no more walkie')
 	go.cancel_animations('.', 'position')
+	particlefx.stop("marker#particles")
+	
 	self.target = nil
 	self.attempts = 0
 end
@@ -28,11 +30,14 @@ local function goto_target(self)
 		return
 	end
 
+	go.set_position(self.target, 'marker')
+	particlefx.play("marker#particles")
+
 	local pos = go.get_position()
 	local dir = self.target - pos
 	local distance = vmath.length(dir)
 
-	if (distance <= BEACON_THRESHOLD) then
+	if (distance <= TARGET_THRESHOLD) then
 		stop(self)
 		return
 	end
@@ -53,6 +58,19 @@ local function goto_target(self)
 	self.attempts = self.attempts + 1
 	go.animate('.', 'position', go.PLAYBACK_ONCE_FORWARD, pos + shift, go.EASING_OUTBACK, 1.5, 0, function(self) 
 		self.attempts = 0
+		goto_target(self)
+	end)
+end
+
+local function retry(self, dir)
+	print(dir)
+	dir.x, dir.y = dir.y, dir.x
+	local pos = go.get_position()
+	local koeff = math.random(1, 2) == 1 and 1 or -1
+	local shift = dir * TARGET_THRESHOLD / 2 * koeff
+	print(dir, shift)
+	
+	go.animate('.', 'position', go.PLAYBACK_ONCE_FORWARD, pos + shift, go.EASING_OUTBACK, 1, 0, function(self) 
 		goto_target(self)
 	end)
 end
@@ -78,9 +96,13 @@ local function process_collision(self, message, sender)
 				-- Accumulate correction done
 				self.correction = self.correction + comp
 
+				-- TODO: provide feedback when robot hits obstacle
+				print('uh oh, robot vs. wall')
+
 				-- Also, retry or stop
 				if message.group == hash('wall') and self.attempts < self.max_attempts then
-					timer.delay(0, false, function() goto_target(self) end)
+					go.cancel_animations('.', 'position')
+					timer.delay(0, false, function() retry(self, message.normal) end)
 				else
 					stop(self)
 				end
