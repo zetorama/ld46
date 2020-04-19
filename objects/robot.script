@@ -63,12 +63,10 @@ local function goto_target(self)
 end
 
 local function retry(self, dir)
-	print(dir)
 	dir.x, dir.y = dir.y, dir.x
 	local pos = go.get_position()
 	local koeff = math.random(1, 2) == 1 and 1 or -1
 	local shift = dir * TARGET_THRESHOLD / 2 * koeff
-	print(dir, shift)
 	
 	go.animate('.', 'position', go.PLAYBACK_ONCE_FORWARD, pos + shift, go.EASING_OUTBACK, 1, 0, function(self) 
 		goto_target(self)
