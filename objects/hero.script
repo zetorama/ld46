@@ -5,13 +5,43 @@ local log = require 'utils.log'
 local function reset(self)
 	self.input = {}
 	self.dir = vmath.vector3()
+	self.facing = 'front'
+	self.anim = nil
 	self.correction = vmath.vector3()
 	self.has_beacon = false
 end
 
+local function animate_character(self)
+	local is_moving = vmath.length(self.dir) > 0
+
+	if is_moving then
+		if self.dir.y > 0 then
+			self.facing = 'back'
+		elseif self.dir.x == 0 then
+			self.facing = 'front'
+		elseif self.dir.x < 0 then
+			self.facing = 'left'
+		else
+			self.facing = 'right'
+		end
+	end
+
+	local prefix = 'hero'
+	local state = is_moving and 'walk' or 'idle'
+	local tool = self.has_beacon and 'beacon' or 'empty'
+	local anim = hash(prefix .. '-' .. state .. '-' .. tool .. '-' .. self.facing)
+
+	if self.anim ~= anim then
+		print('animate_character', anim)
+
+		self.anim = anim
+		msg.post('#sprite', 'play_animation', {id = self.anim})
+	end
+end
+
 local function trigger_action(self)
 	if self.has_beacon then
-		msg.post('robot', 'beacon', { position = go.get_position() })
+		msg.post('robot', 'beacon', {position = go.get_position()})
 	else
 		-- TODO: give feedback that there's no any action available
 		print('HERO: no beacon, no action')
@@ -20,9 +50,8 @@ end
 
 local function process_collision(self, message, sender)
 	if message.group == hash('beacon') then
-		msg.post('beacon#collisionobject', 'disable')
 		msg.post('beacon', 'set_parent', {parent_id = go.get_id()})
-		go.set_position(go.get_position() + vmath.vector3(0, 8, 0), 'beacon')
+		msg.post('beacon', 'disable')
 		self.has_beacon = true
 	end
 
@@ -49,6 +78,7 @@ end
 
 function init(self)
 	reset(self)
+	animate_character(self)
 	msg.post('.', 'acquire_input_focus')
 end
 
@@ -79,7 +109,10 @@ function update(self, dt)
 	local newPos = pos + self.dir * self.speed * dt
 	go.set_position(newPos)
 
-	-- reset things
+	-- update facing and switch to proper character animation
+	animate_character(self)
+
+	-- reset/track things
 	self.correction = vmath.vector3()
 end
 

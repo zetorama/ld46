@@ -66,7 +66,7 @@ embedded_components {
   id: "sprite"
   type: "sprite"
   data: "tile_set: \"/assets/characters.atlas\"\n"
-  "default_animation: \"hero-face\"\n"
+  "default_animation: \"hero-idle-empty-front\"\n"
   "material: \"/builtins/materials/sprite.material\"\n"
   "blend_mode: BLEND_MODE_ALPHA\n"
   ""
