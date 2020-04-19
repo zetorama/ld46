@@ -48,6 +48,8 @@ embedded_instances {
   "restitution: 0.5\\n"
   "group: \\\"\\\"\\n"
   "mask: \\\"hero\\\"\\n"
+  "mask: \\\"robot\\\"\\n"
+  "mask: \\\"alien\\\"\\n"
   "linear_damping: 0.0\\n"
   "angular_damping: 0.0\\n"
   "locked_rotation: false\\n"
