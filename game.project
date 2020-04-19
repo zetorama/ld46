@@ -1,6 +1,6 @@
 [project]
 title = ld46
-dependencies = https://github.com/britzl/defold-orthographic/archive/master.zip,https://github.com/rgrams/debug-draw/archive/master.zip
+dependencies = https://github.com/britzl/defold-orthographic/archive/master.zip,https://github.com/rgrams/debug-draw/archive/master.zip,https://github.com/subsoap/defos/archive/master.zip
 
 [bootstrap]
 main_collection = /main/main.collectionc

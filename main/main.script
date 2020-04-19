@@ -2,7 +2,15 @@
 local camera = require "orthographic.camera"
 
 function init(self)
-	camera.set_window_scaling_factor(2)
+	display_id = defos.get_current_display_id()
+	modes = defos.get_display_modes(display_id)
+
+	if modes[1] then
+		camera.set_window_scaling_factor(modes[1].scaling_factor or 1)
+	else 
+		-- assuming, this is html5 build
+		camera.set_window_scaling_factor(2)
+	end
 	
 	-- msg.post(".", "acquire_input_focus")
 	-- msg.post("@render:", "use_fixed_fit_projection", { near = -1, far = 1 })
