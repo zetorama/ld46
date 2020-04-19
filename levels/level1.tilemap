@@ -1321,7 +1321,7 @@ layers {
   }
 }
 layers {
-  id: "walls"
+  id: "wall"
   z: 0.0
   is_visible: 1
   cell {

@@ -1,0 +1,117 @@
+math.randomseed(os.time())
+go.property('speed', 50)
+go.property('should_walk_on_start', true)
+go.property('max_attempts', 3)
+
+local log = require 'utils.log'
+
+local ROBOT_STEP = 16
+local BEACON_THRESHOLD = 16
+
+local function reset(self)
+	self.correction = vmath.vector3()
+	self.target = nil
+	self.attempts = 0
+end
+
+local function stop(self)
+	-- TODO: give feedback, that robot cannot move anymore
+	print('ROBOT: no more walkie')
+	go.cancel_animations('.', 'position')
+	self.target = nil
+	self.attempts = 0
+end
+
+local function goto_target(self)
+	if not self.target then
+		stop(self)
+		return
+	end
+
+	local pos = go.get_position()
+	local dir = self.target - pos
+	local distance = vmath.length(dir)
+
+	if (distance <= BEACON_THRESHOLD) then
+		stop(self)
+		return
+	end
+
+	local axis
+	if math.abs(dir.x) == 0 then
+		axis = 'y'
+	elseif math.abs(dir.y) == 0 then
+		axis = 'x'
+	else
+		-- randomly select one of two directions
+		axis = ({'x', 'y'})[math.random(1, 2)]
+	end
+
+	local shift = vmath.vector3()
+	shift[axis] = math.max(-ROBOT_STEP, math.min(dir[axis], ROBOT_STEP))
+
+	self.attempts = self.attempts + 1
+	go.animate('.', 'position', go.PLAYBACK_ONCE_FORWARD, pos + shift, go.EASING_OUTBACK, 1.5, 0, function(self) 
+		self.attempts = 0
+		goto_target(self)
+	end)
+end
+
+local function process_collision(self, message, sender)
+	-- if message.group == hash("beacon") then
+	-- end
+
+	if message.group == hash('wall') or message.group == hash('hero') then
+		-- Get the info needed to move out of collision. We might
+		-- get several contact points back and have to calculate
+		-- how to move out of all of them by accumulating a
+		-- correction vector for this frame:
+		if message.distance > 0 then
+			-- First, project the accumulated correction onto
+			-- the penetration vector
+			local proj = vmath.project(self.correction, message.normal * message.distance)
+			if proj < 1 then
+				-- Only care for projections that does not overshoot.
+				local comp = (message.distance - message.distance * proj) * message.normal
+				-- Apply compensation
+				go.set_position(go.get_position() + comp)
+				-- Accumulate correction done
+				self.correction = self.correction + comp
+
+				-- Also, retry or stop
+				if message.group == hash('wall') and self.attempts < self.max_attempts then
+					timer.delay(0, false, function() goto_target(self) end)
+				else
+					stop(self)
+				end
+			end
+		end
+	end
+end
+
+local function process_beacon(self, opts)
+	stop(self)
+	self.target = opts and opts.position or go.get_position('beacon')
+	goto_target(self)
+end
+
+function init(self)
+	reset(self)
+
+	if self.should_walk_on_start then
+		process_beacon(self)
+	end
+end
+
+function update(self, dt)
+	local pos = go.get_position()
+	log.text(self.target and ('go to target' .. self.target) or 'idle' , pos.x, pos.y + 12)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash('contact_point_response') then
+		process_collision(self, message, sender)
+	elseif message_id == hash('beacon') then
+		process_beacon(self, message)
+	end
+end

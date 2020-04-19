@@ -4,8 +4,8 @@ instances {
   prototype: "/orthographic/camera.go"
   children: "bg"
   position {
-    x: 160.0
-    y: 90.0
+    x: 0.0
+    y: 0.0
     z: 0.0
   }
   rotation {
@@ -33,7 +33,7 @@ instances {
     }
     properties {
       id: "projection"
-      value: "FIXED_ZOOM"
+      value: "FIXED_AUTO"
       type: PROPERTY_TYPE_HASH
     }
     properties {
@@ -87,8 +87,8 @@ instances {
   id: "hero"
   prototype: "/objects/hero.go"
   position {
-    x: 160.0
-    y: 90.0
+    x: 30.0
+    y: 30.0
     z: 0.1
   }
   rotation {
@@ -107,8 +107,28 @@ instances {
   id: "robot"
   prototype: "/objects/robot.go"
   position {
-    x: 50.0
-    y: 50.0
+    x: 25.0
+    y: 130.0
+    z: 0.1
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+instances {
+  id: "beacon"
+  prototype: "/objects/beacon.go"
+  position {
+    x: 130.0
+    y: 100.0
     z: 0.1
   }
   rotation {
