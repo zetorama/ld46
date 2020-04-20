@@ -4,11 +4,16 @@ go.property('activatation_time', 2)
 
 local function switch_state(self, is_on)
 	if is_on then
+		msg.post('#highlight', 'disable')
+
 		msg.post('#collisionobject-off', 'disable')
 		msg.post('#sprite-off', 'disable')
 		msg.post('#collisionobject-on', 'enable')
 		msg.post('#sprite-on', 'enable')
+		
 	else
+		msg.post('#highlight', 'enable')
+		
 		msg.post('#collisionobject-off', 'enable')
 		msg.post('#sprite-off', 'enable')
 		msg.post('#collisionobject-on', 'disable')

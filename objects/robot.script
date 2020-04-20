@@ -8,6 +8,8 @@ local log = require 'utils.log'
 local TARGET_THRESHOLD = 8
 
 local function reset(self)
+	msg.post('#highlight', 'disable')
+
 	self.facing = 'front'
 	self.anim = nil
 	self.dir = vmath.vector3()
@@ -53,6 +55,10 @@ local function stop(self)
 
 	self.target = nil
 	self.attempts = 0
+
+	if not self.connected_machine then
+		self.facing = 'front'
+	end
 	self.dir = vmath.vector3()
 	animate_character(self)
 end
