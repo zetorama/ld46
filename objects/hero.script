@@ -32,8 +32,6 @@ local function animate_character(self)
 	local anim = hash(prefix .. '-' .. state .. '-' .. tool .. '-' .. self.facing)
 
 	if self.anim ~= anim then
-		print('animate_character', anim)
-
 		self.anim = anim
 		msg.post('#sprite', 'play_animation', {id = self.anim})
 	end
