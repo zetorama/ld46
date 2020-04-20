@@ -1428,7 +1428,7 @@ convex_hulls {
 convex_hulls {
   index: 431
   count: 4
-  collision_group: "wall"
+  collision_group: ""
 }
 convex_hulls {
   index: 435
@@ -2112,6 +2112,15 @@ animations {
   end_tile: 261
   playback: PLAYBACK_ONCE_FORWARD
   fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "door-open"
+  start_tile: 285
+  end_tile: 286
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 5
   flip_horizontal: 0
   flip_vertical: 0
 }
