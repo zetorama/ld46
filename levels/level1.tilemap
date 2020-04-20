@@ -1322,7 +1322,7 @@ layers {
 }
 layers {
   id: "wall"
-  z: 0.0
+  z: -0.05
   is_visible: 1
   cell {
     x: 0
@@ -1677,7 +1677,7 @@ layers {
   cell {
     x: 3
     y: 8
-    tile: 406
+    tile: 412
     h_flip: 0
     v_flip: 0
   }
@@ -1727,13 +1727,6 @@ layers {
     x: 4
     y: 9
     tile: 242
-    h_flip: 0
-    v_flip: 0
-  }
-  cell {
-    x: 7
-    y: 9
-    tile: 267
     h_flip: 0
     v_flip: 0
   }
@@ -1818,13 +1811,6 @@ layers {
     x: 10
     y: 11
     tile: 341
-    h_flip: 0
-    v_flip: 0
-  }
-  cell {
-    x: 11
-    y: 11
-    tile: 340
     h_flip: 0
     v_flip: 0
   }
@@ -2095,13 +2081,6 @@ layers {
     v_flip: 0
   }
   cell {
-    x: 3
-    y: 18
-    tile: 256
-    h_flip: 0
-    v_flip: 0
-  }
-  cell {
     x: 4
     y: 18
     tile: 257
@@ -2126,20 +2105,6 @@ layers {
     x: 7
     y: 18
     tile: 257
-    h_flip: 0
-    v_flip: 0
-  }
-  cell {
-    x: 8
-    y: 18
-    tile: 312
-    h_flip: 0
-    v_flip: 0
-  }
-  cell {
-    x: 9
-    y: 18
-    tile: 313
     h_flip: 0
     v_flip: 0
   }
@@ -2223,14 +2188,14 @@ layers {
   cell {
     x: 8
     y: 19
-    tile: 187
+    tile: 186
     h_flip: 0
     v_flip: 0
   }
   cell {
     x: 9
     y: 19
-    tile: 187
+    tile: 186
     h_flip: 0
     v_flip: 0
   }
@@ -2252,6 +2217,46 @@ layers {
     x: 12
     y: 19
     tile: 190
+    h_flip: 0
+    v_flip: 0
+  }
+}
+layers {
+  id: "debug-machines"
+  z: 0.0
+  is_visible: 0
+  cell {
+    x: 7
+    y: 9
+    tile: 267
+    h_flip: 0
+    v_flip: 0
+  }
+  cell {
+    x: 11
+    y: 11
+    tile: 340
+    h_flip: 0
+    v_flip: 0
+  }
+  cell {
+    x: 3
+    y: 18
+    tile: 228
+    h_flip: 0
+    v_flip: 0
+  }
+  cell {
+    x: 8
+    y: 18
+    tile: 312
+    h_flip: 0
+    v_flip: 0
+  }
+  cell {
+    x: 9
+    y: 18
+    tile: 313
     h_flip: 0
     v_flip: 0
   }

@@ -1,0 +1,57 @@
+go.property('type', 'door')
+go.property('is_on', false)
+go.property('activatation_time', 2)
+
+local function switch_state(self, is_on)
+	if is_on then
+		msg.post('#collisionobject-off', 'disable')
+		msg.post('#sprite-off', 'disable')
+		msg.post('#collisionobject-on', 'enable')
+		msg.post('#sprite-on', 'enable')
+	else
+		msg.post('#collisionobject-off', 'enable')
+		msg.post('#sprite-off', 'enable')
+		msg.post('#collisionobject-on', 'disable')
+		msg.post('#sprite-on', 'disable')
+	end
+
+	self.is_on = is_on
+end
+
+local function activate_connection(self)
+	if self.is_active then return end
+
+	particlefx.play('#particles-activate')
+	self.is_active = true
+end
+
+local function drop_connection(self)
+	if not self.is_active then return end
+
+	particlefx.stop('#particles-activate')
+	self.is_active = false
+end
+
+function init(self)
+	self.is_active = false
+	switch_state(self, self.is_on)
+end
+
+function update(self, dt)
+	if self.is_active then
+		self.activatation_time = self.activatation_time - dt
+	end
+
+	if self.activatation_time <= 0 then
+		drop_connection(self)
+		switch_state(self, true)
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash('activate_connection') then
+		activate_connection(self)
+	elseif message_id == hash('drop_connection') then
+		drop_connection(self)
+	end
+end

@@ -1,5 +1,7 @@
 go.property('speed', 100)
 
+local TARGET_THRESHOLD = 16
+
 local log = require 'utils.log'
 
 local function reset(self)
@@ -9,6 +11,21 @@ local function reset(self)
 	self.anim = nil
 	self.correction = vmath.vector3()
 	self.has_beacon = false
+end
+
+local function get_dir_by_facing(facing)
+	local dir = vmath.vector3()
+	if facing == 'back' then
+		dir.y = 1
+	elseif facing == 'right' then
+		dir.x = 1
+	elseif facing == 'left' then
+		dir.x = -1
+	else
+		dir.y = -1
+	end
+
+	return dir
 end
 
 local function animate_character(self)
@@ -38,12 +55,23 @@ local function animate_character(self)
 end
 
 local function trigger_action(self)
-	if self.has_beacon then
-		msg.post('robot', 'beacon', {position = go.get_position()})
-	else
+	if self.has_beacon == false then
 		-- TODO: give feedback that there's no any action available
 		print('HERO: no beacon, no action')
+		return
 	end
+
+	local dir = get_dir_by_facing(self.facing)
+	local pos = go.get_position()
+	local to = pos + TARGET_THRESHOLD * dir
+	local collision = physics.raycast(pos, to, {hash('machine')})
+
+	if collision then
+		print('Found machine!', collision.id)
+		pos = go.get_position(collision.id)
+	end
+
+	msg.post('robot', 'signal_beacon', {position = pos})
 end
 
 local function process_collision(self, message, sender)
@@ -53,7 +81,7 @@ local function process_collision(self, message, sender)
 		self.has_beacon = true
 	end
 
-	if message.group == hash('wall') or message.group == hash('robot') then
+	if message.group == hash('wall') or message.group == hash('robot') or message.group == hash('machine') then
 		-- Get the info needed to move out of collision. We might
 		-- get several contact points back and have to calculate
 		-- how to move out of all of them by accumulating a

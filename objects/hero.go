@@ -25,6 +25,7 @@ embedded_components {
   "mask: \"wall\"\n"
   "mask: \"robot\"\n"
   "mask: \"beacon\"\n"
+  "mask: \"machine\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"
   "    shape_type: TYPE_BOX\n"

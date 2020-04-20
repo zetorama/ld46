@@ -5,7 +5,7 @@ go.property('max_attempts', 3)
 
 local log = require 'utils.log'
 
-local TARGET_THRESHOLD = 16
+local TARGET_THRESHOLD = 8
 
 local function reset(self)
 	self.facing = 'front'
@@ -14,6 +14,8 @@ local function reset(self)
 	self.correction = vmath.vector3()
 	self.target = nil
 	self.attempts = 0
+
+	self.connected_machine = nil
 end
 
 local function animate_character(self)
@@ -60,6 +62,11 @@ local function goto_target(self)
 	if not self.target then
 		stop(self)
 		return
+	end
+
+	if self.connected_machine then
+		msg.post(self.connected_machine, 'drop_connection')
+		self.connected_machine = nil
 	end
 
 	go.set_position(self.target, 'marker')
@@ -156,10 +163,7 @@ local function retry(self)
 end
 
 local function process_collision(self, message, sender)
-	-- if message.group == hash("beacon") then
-	-- end
-
-	if message.group == hash('wall') or message.group == hash('hero') then
+	if message.group == hash('wall') or message.group == hash('hero') or message.group == hash('machine') then
 		-- Get the info needed to move out of collision. We might
 		-- get several contact points back and have to calculate
 		-- how to move out of all of them by accumulating a
@@ -189,6 +193,11 @@ local function process_collision(self, message, sender)
 			end
 		end
 	end
+
+	if message.group == hash("machine") then
+		self.connected_machine = message.other_id
+		msg.post(self.connected_machine, 'activate_connection', { position = go.get_position() })
+	end
 end
 
 local function process_beacon(self, opts)
@@ -214,7 +223,7 @@ end
 function on_message(self, message_id, message, sender)
 	if message_id == hash('contact_point_response') then
 		process_collision(self, message, sender)
-	elseif message_id == hash('beacon') then
+	elseif message_id == hash('signal_beacon') then
 		process_beacon(self, message)
 	end
 end

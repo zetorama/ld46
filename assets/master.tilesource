@@ -1428,7 +1428,7 @@ convex_hulls {
 convex_hulls {
   index: 433
   count: 4
-  collision_group: ""
+  collision_group: "wall"
 }
 convex_hulls {
   index: 437
@@ -2121,6 +2121,42 @@ animations {
   end_tile: 286
   playback: PLAYBACK_LOOP_FORWARD
   fps: 5
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "machine-door-off-left"
+  start_tile: 268
+  end_tile: 268
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "machine-door-on-left"
+  start_tile: 296
+  end_tile: 296
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 4
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "machine-hvac-off-front"
+  start_tile: 341
+  end_tile: 341
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "machine-hvac-on-front"
+  start_tile: 201
+  end_tile: 201
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 1
   flip_horizontal: 0
   flip_vertical: 0
 }
