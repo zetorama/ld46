@@ -27,10 +27,10 @@ embedded_components {
   "mask: \"beacon\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"
-  "    shape_type: TYPE_SPHERE\n"
+  "    shape_type: TYPE_BOX\n"
   "    position {\n"
   "      x: 0.0\n"
-  "      y: -2.0\n"
+  "      y: 0.0\n"
   "      z: 0.0\n"
   "    }\n"
   "    rotation {\n"
@@ -40,26 +40,11 @@ embedded_components {
   "      w: 1.0\n"
   "    }\n"
   "    index: 0\n"
-  "    count: 1\n"
-  "  }\n"
-  "  shapes {\n"
-  "    shape_type: TYPE_SPHERE\n"
-  "    position {\n"
-  "      x: 0.0\n"
-  "      y: -5.5\n"
-  "      z: 0.0\n"
-  "    }\n"
-  "    rotation {\n"
-  "      x: 0.0\n"
-  "      y: 0.0\n"
-  "      z: 0.0\n"
-  "      w: 1.0\n"
-  "    }\n"
-  "    index: 1\n"
-  "    count: 1\n"
+  "    count: 3\n"
   "  }\n"
   "  data: 3.0\n"
-  "  data: 2.5\n"
+  "  data: 5.0\n"
+  "  data: 10.0\n"
   "}\n"
   "linear_damping: 0.0\n"
   "angular_damping: 0.0\n"
@@ -87,7 +72,7 @@ embedded_components {
   ""
   position {
     x: 0.0
-    y: 0.0
+    y: 3.0
     z: 0.0
   }
   rotation {
