@@ -55,6 +55,7 @@ local function stop(self)
 	animate_character(self)
 end
 
+local retry = nil -- prevents circular calls (https://stackoverflow.com/a/11150669)
 local function goto_target(self)
 	if not self.target then
 		stop(self)
@@ -62,7 +63,6 @@ local function goto_target(self)
 	end
 
 	go.set_position(self.target, 'marker')
-	particlefx.play('marker#particles')
 
 	local pos = go.get_position()
 	local dir = self.target - pos
@@ -80,17 +80,30 @@ local function goto_target(self)
 		axis = 'x'
 	else
 		-- randomly select one of two directions
-		axis = ({'x', 'y'})[math.random(1, 2)]
+		axis = ({'x', 'y'})[math.random(10) > 5 and 1 or 2]
 	end
 
 	local shift = vmath.vector3()
 	shift[axis] = math.max(-self.distance_per_step, math.min(dir[axis], self.distance_per_step))
+
+	local collision = physics.raycast(pos, pos + shift, {hash('robot'), hash('wall')})
+	pprint(collision)
+	if collision then 
+		if collision.fraction < 0.1 then
+			-- there's no much distance to walk, eh?
+			retry(self)
+		else
+			-- make sure to stay out of walls
+			shift = shift * math.floor(collision.fraction * 100 - 5) / 100
+		end
+	end
+	
+	local duration = vmath.length(shift) / self.speed
+	if duration == 0 then stop(self) end
 	
 	self.dir = shift
 	animate_character(self)
 	
-	local duration = vmath.length(shift) / self.speed
-	self.attempts = self.attempts + 1
 	go.animate(
 		'.',
 		'position',
@@ -107,7 +120,10 @@ local function goto_target(self)
 end
 
 local function retry(self)
-	if not self.target then
+	print('attempts', self.attempts, self.max_attempts)
+
+	go.cancel_animations('.', 'position')
+	if not self.target or self.attempts >= self.max_attempts then
 		stop(self)
 		return
 	end
@@ -115,12 +131,17 @@ local function retry(self)
 	local pos = go.get_position()
 	local shift = vmath.vector3()
 
-	-- if self.attempts == 1 then
+	if self.attempts == 1 then
 		-- first time just roll back a little
 		shift = self.dir * -1/2
-	-- elseif self.attempts == 2 then
-	-- 	shift
-	-- end
+	else
+		-- then, let's try to move along the other axis
+		local axis = self.dir.x == 0 and 'x' or 'y'
+		local dir = self.target[axis] > pos[axis] and 1 or -1
+		if self.attempts > 2 then dir = dir * -1 end
+
+		shift[axis] = self.distance_per_step / 2 * dir
+	end
 
 	go.animate(
 		'.',
@@ -159,13 +180,9 @@ local function process_collision(self, message, sender)
 				print('uh oh, robot vs. obstacle')
 
 				-- Also, retry or stop
-				if message.group == hash('wall') and self.attempts < self.max_attempts then
-					go.cancel_animations('.', 'position')
-					timer.delay(
-						0,
-						false,
-						retry
-					)
+				if message.group == hash('wall') then
+					self.attempts = self.attempts + 1
+					retry(self)
 				else
 					stop(self)
 				end
@@ -177,6 +194,7 @@ end
 local function process_beacon(self, opts)
 	stop(self)
 	self.target = opts and opts.position or go.get_position('beacon')
+	particlefx.play('marker#particles')
 	goto_target(self)
 end
 
