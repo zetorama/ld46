@@ -1,0 +1,23 @@
+go.property('is_active', false)
+
+function init(self)
+	msg.post('#highlight', 'disable')
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash('drop') then
+		go.set_position(message.position)
+	elseif message_id == hash('activate') then
+		if not self.is_active then
+			particlefx.play('#particles')
+			msg.post('#highlight', 'enable')
+			self.is_active = true
+		end
+	elseif message_id == hash('deactivate') then
+		if self.is_active then
+			particlefx.stop('#particles')
+			msg.post('#highlight', 'disable')
+			self.is_active = false
+		end
+	end
+end

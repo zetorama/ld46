@@ -13,7 +13,7 @@ local function switch_state(self, is_on)
 		
 	else
 		msg.post('#highlight', 'enable')
-		
+
 		msg.post('#collisionobject-off', 'enable')
 		msg.post('#sprite-off', 'enable')
 		msg.post('#collisionobject-on', 'disable')

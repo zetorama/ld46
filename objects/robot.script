@@ -1,7 +1,7 @@
-go.property('distance_per_step', 16)
-go.property('speed', 20)
+go.property('distance_per_step', 8)
+go.property('speed', 15)
 go.property('should_walk_on_start', true)
-go.property('max_attempts', 3)
+go.property('max_attempts', 10)
 
 local log = require 'utils.log'
 
@@ -14,10 +14,32 @@ local function reset(self)
 	self.anim = nil
 	self.dir = vmath.vector3()
 	self.correction = vmath.vector3()
-	self.target = nil
+	self.target_position = nil
 	self.attempts = 0
 
 	self.connected_machine = nil
+end
+
+local function random_dir(facing)
+	local dir = math.random(1, 8)
+	if dir > 4 then
+		local opposite_dir = {
+			front = 4,
+			back = 3,
+			left = 2,
+			right = 1
+		}
+		dir = opposite_dir[facing]
+	end
+
+	local dirs = {
+		vmath.vector3(-1, 0, 0), -- go left
+		vmath.vector3(1, 0, 0), -- go right
+		vmath.vector3(0, -1, 0), -- go down
+		vmath.vector3(0, 1, 0) -- go up
+	}
+
+	return dirs[dir]
 end
 
 local function animate_character(self)
@@ -46,14 +68,14 @@ local function animate_character(self)
 	end
 end
 
-
 local function stop(self)
 	-- TODO: give feedback, that robot cannot move anymore
 	print('ROBOT: no more walkie')
 	go.cancel_animations('.', 'position')
-	particlefx.stop('marker#particles')
+	-- particlefx.stop('marker#particles')
+	msg.post('marker', 'deactivate')
 
-	self.target = nil
+	self.target_position = nil
 	self.attempts = 0
 
 	if not self.connected_machine then
@@ -64,8 +86,9 @@ local function stop(self)
 end
 
 local retry = nil -- prevents circular calls (https://stackoverflow.com/a/11150669)
+
 local function goto_target(self)
-	if not self.target then
+	if not self.target_position then
 		stop(self)
 		return
 	end
@@ -75,10 +98,11 @@ local function goto_target(self)
 		self.connected_machine = nil
 	end
 
-	go.set_position(self.target, 'marker')
+	-- go.set_position(self.target_position, 'marker')
+	msg.post('marker', 'drop', {position = self.target_position})
 
 	local pos = go.get_position()
-	local dir = self.target - pos
+	local dir = self.target_position - pos
 	local distance = vmath.length(dir)
 
 	if (distance <= TARGET_THRESHOLD) then
@@ -99,24 +123,26 @@ local function goto_target(self)
 	local shift = vmath.vector3()
 	shift[axis] = math.max(-self.distance_per_step, math.min(dir[axis], self.distance_per_step))
 
-	local collision = physics.raycast(pos, pos + shift, {hash('robot'), hash('wall')})
-	pprint(collision)
-	if collision then 
+	local cast_from = pos + vmath.vector3(2.5, 2.5, 0)
+	local collision = physics.raycast(cast_from, cast_from + shift, {hash('machine'), hash('wall')})
+	if collision then
 		if collision.fraction < 0.1 then
 			-- there's no much distance to walk, eh?
 			retry(self)
 		else
 			-- make sure to stay out of walls
-			shift = shift * math.floor(collision.fraction * 100 - 5) / 100
+			shift = shift * math.floor(collision.fraction * 100 - 11) / 100
 		end
 	end
-	
+
 	local duration = vmath.length(shift) / self.speed
-	if duration == 0 then stop(self) end
-	
+	if duration == 0 then
+		stop(self)
+	end
+
 	self.dir = shift
 	animate_character(self)
-	
+
 	go.animate(
 		'.',
 		'position',
@@ -126,46 +152,43 @@ local function goto_target(self)
 		duration,
 		0,
 		function(self)
-			self.attempts = 0
 			goto_target(self)
 		end
 	)
 end
 
 local function retry(self)
+	self.attempts = self.attempts + 1
 	print('attempts', self.attempts, self.max_attempts)
 
 	go.cancel_animations('.', 'position')
-	if not self.target or self.attempts >= self.max_attempts then
+	if not self.target_position or self.attempts >= self.max_attempts then
 		stop(self)
 		return
 	end
 
-	local pos = go.get_position()
-	local shift = vmath.vector3()
-
-	if self.attempts == 1 then
-		-- first time just roll back a little
-		shift = self.dir * -1/2
-	else
-		-- then, let's try to move along the other axis
-		local axis = self.dir.x == 0 and 'x' or 'y'
-		local dir = self.target[axis] > pos[axis] and 1 or -1
-		if self.attempts > 2 then dir = dir * -1 end
-
-		shift[axis] = self.distance_per_step / 2 * dir
+	if self.connected_machine then
+		msg.post(self.connected_machine, 'drop_connection')
+		self.connected_machine = nil
 	end
 
-	go.animate(
-		'.',
-		'position',
-		go.PLAYBACK_ONCE_FORWARD,
-		pos + shift,
-		go.EASING_OUTBACK,
-		1,
-		0,
-		goto_target
-	)
+	local pos = go.get_position()
+	local shift = random_dir(self.facing) * self.distance_per_step / 2
+	-- local shift = vmath.vector3()
+
+	-- if self.attempts == 1 then
+	-- 	-- first time just roll back a little
+	-- 	shift = self.dir * -1/2
+	-- else
+	-- 	-- then, let's try to move along the other axis
+	-- 	local axis = self.dir.x == 0 and 'x' or 'y'
+	-- 	local dir = self.target_position[axis] > pos[axis] and 1 or -1
+	-- 	if self.attempts > 2 then dir = dir * -1 end
+
+	-- 	shift[axis] = self.distance_per_step / 2 * dir
+	-- end
+
+	go.animate('.', 'position', go.PLAYBACK_ONCE_FORWARD, pos + shift, go.EASING_OUTBACK, 1, 0, goto_target)
 end
 
 local function process_collision(self, message, sender)
@@ -200,16 +223,17 @@ local function process_collision(self, message, sender)
 		end
 	end
 
-	if message.group == hash("machine") then
+	if message.group == hash('machine') then
 		self.connected_machine = message.other_id
-		msg.post(self.connected_machine, 'activate_connection', { position = go.get_position() })
+		msg.post(self.connected_machine, 'activate_connection')
 	end
 end
 
 local function process_beacon(self, opts)
 	stop(self)
-	self.target = opts and opts.position or go.get_position('beacon')
-	particlefx.play('marker#particles')
+	self.target_position = opts and opts.position or go.get_position('beacon')
+	-- particlefx.play('marker#particles')
+	msg.post('marker', 'activate')
 	goto_target(self)
 end
 
@@ -223,7 +247,9 @@ end
 
 function update(self, dt)
 	local pos = go.get_position()
-	log.text(self.target and ('go to target' .. self.target) or 'idle', pos.x, pos.y + 12)
+	log.text(self.target_position and ('go to target' .. self.target_position) or 'idle', pos.x, pos.y + 12)
+
+	-- log.text( '' , pos.x, pos.y + 16)
 end
 
 function on_message(self, message_id, message, sender)

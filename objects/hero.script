@@ -1,4 +1,4 @@
-go.property('speed', 100)
+go.property('speed', 50)
 
 local TARGET_THRESHOLD = 16
 

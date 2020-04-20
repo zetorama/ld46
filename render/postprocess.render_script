@@ -1,6 +1,6 @@
 local render_helper = require "orthographic.render.helper"
 
-local BRIGHTNESS = 0.18
+local BRIGHTNESS = 0.12
 
 local IDENTITY = vmath.matrix4()
 
